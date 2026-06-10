@@ -138,6 +138,34 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /readings/{reading_id}:
+    get:
+      operationId: getReading
+      summary: Lấy chi tiết một reading theo ID
+      description: Trả về thông tin chi tiết của một reading dựa trên reading_id.
+      tags:
+        - readings
+      parameters:
+        - name: reading_id
+          in: path
+          required: true
+          description: ID của reading cần lấy
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Chi tiết reading
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadingSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -152,7 +180,7 @@ components:
       required:
         - status
         - service
-        - time
+        - version
       properties:
         status:
           type: string
@@ -160,9 +188,9 @@ components:
         service:
           type: string
           example: iot-ingestion-service
-        time:
+        version:
           type: string
-          format: date-time
+          example: 0.4.0
 
     ReadingInput:
       type: object
@@ -315,12 +343,13 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ProblemDetails'
-    Conflict:
-      description: Xung đột dữ liệu
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            readingNotFound:
+              value:
+                type: 'https://smart-campus.local/problems/not-found'
+                title: 'Not Found'
+                status: 404
+                detail: 'Reading R-20260513-0001 does not exist'
     UnprocessableEntity:
       description: Payload đúng JSON nhưng sai nghiệp vụ
       content:
